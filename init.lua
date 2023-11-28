@@ -478,13 +478,24 @@ minetest.register_node("anvil:anvil", {
 	is_ground_content = false,
 
 	on_blast = function(pos, intensity)
-		local drops = {"anvil:anvil"}
+		local anvil_item = ItemStack("anvil:anvil")
+
 		local meta = minetest.get_meta(pos)
+
+		if meta:get_int("shared") == 1 then
+			local item_meta = anvil_item:get_meta()
+			item_meta:set_int("shared", 1)
+			item_meta:set_string("description", S("Shared anvil"))
+		end
+
+		local drops = {anvil_item}
+
 		local inv = meta:get_inventory()
 		local input = inv:get_stack("input", 1)
 		if not input:is_empty() then
 			drops[2] = input:to_string()
 		end
+
 		remove_item(pos)
 		minetest.remove_node(pos)
 
